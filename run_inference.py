@@ -1,11 +1,10 @@
 import tensorflow as tf
 import numpy as np
 import os
+import argparse
 from PIL import Image
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
-import argparse
-import os
 
 
 DEFAULT_MODEL_PATH = "./exported-models/my_model/saved_model"
@@ -43,7 +42,7 @@ def inference(inputPath, modelPath, labelPath, outputPath):
             detections = detect_fn(input_tensor)
         except ValueError:
             print("Oops!")
-            continue
+            return
 
         # Convert to numpy arrays, and take index [0] to remove the batch dimension
         num_detections = int(detections.pop('num_detections'))
