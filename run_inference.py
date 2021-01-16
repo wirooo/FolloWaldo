@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import os
 from PIL import Image
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
@@ -38,7 +39,11 @@ def inference(inputPath, modelPath, labelPath, outputPath):
         input_tensor = input_tensor[tf.newaxis, ...]
 
         # input_tensor = np.expand_dims(image_np, 0)
-        detections = detect_fn(input_tensor)
+        try:
+            detections = detect_fn(input_tensor)
+        except ValueError:
+            print("Oops!")
+            continue
 
         # Convert to numpy arrays, and take index [0] to remove the batch dimension
         num_detections = int(detections.pop('num_detections'))
@@ -58,7 +63,7 @@ def inference(inputPath, modelPath, labelPath, outputPath):
             category_index,
             use_normalized_coordinates=True,
             max_boxes_to_draw=1,
-            min_score_thresh=.1,
+            min_score_thresh=.08,
             agnostic_mode=False)
 
         image = Image.fromarray(image_np_with_detections)
