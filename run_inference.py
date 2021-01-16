@@ -3,20 +3,24 @@ import numpy as np
 from PIL import Image
 from object_detection.utils import label_map_util
 from object_detection.utils import visualization_utils as viz_utils
-
-PATH_TO_SAVED_MODEL = "./exported-models/my_model/saved_model"
-PATH_TO_LABEL_MAP = "./annotations/label_map.pbtxt"
-image_paths = ["/1.jpg", "./2.jpg", "./3.jpg", "./4.jpg", "./5.jpg", "./6.jpg", "./7.jpg"]
+import argparse
+import os
 
 
-def inference():
+DEFAULT_MODEL_PATH = "./exported-models/my_model/saved_model"
+DEFAULT_LABEL_MAP_PATH = "./annotations/label_map.pbtxt"
+DEFAULT_IMAGE_INPUT_PATH = "./images/input"
+DEFAULT_IMAGE_OUTPUT_PATH = "./images/output"
+
+
+def inference(inputPath, modelPath, labelPath, outputPath):
     print("Loading model... ", end='')
 
     # Load saved model and build the detection function
-    detect_fn = tf.saved_model.load(PATH_TO_SAVED_MODEL)
+    detect_fn = tf.saved_model.load(modelPath)
 
     # Loading the label_map
-    category_index = label_map_util.create_category_index_from_labelmap(PATH_TO_LABEL_MAP, use_display_name=True)
+    category_index = label_map_util.create_category_index_from_labelmap(labelPath, use_display_name=True)
 
     print("Done!")
 
@@ -24,9 +28,9 @@ def inference():
         # Load an image from file into a numpy array.
         return np.array(Image.open(path))
 
-    for image_path in image_paths:
-        print("Running inference for {}... ".format(image_path), end='')
-        image_np = load_image_into_numpy_array("./images/input" + image_path)
+    def predict(inputPath, imageName, modelPath, labelPath, outputPath):
+        print("Running inference for {}... ".format(os.path.join(inputPath, imageName)), end='')
+        image_np = load_image_into_numpy_array(os.path.join(inputPath, imageName))
 
         # The input needs to be a tensor, convert it using `tf.convert_to_tensor`
         input_tensor = tf.convert_to_tensor(image_np)
@@ -58,9 +62,22 @@ def inference():
             agnostic_mode=False)
 
         image = Image.fromarray(image_np_with_detections)
-        image.save("./images/output" + image_path)
+        image.save(os.path.join(outputPath, imageName))
         print("Done!")
 
 
+    if os.path.isdir(inputPath):
+        for imageName in [i for i in os.listdir(inputPath) if os.path.isfile(os.path.join(inputPath, i))]:
+            predict(inputPath, imageName, modelPath, labelPath, outputPath)
+    else:
+        predict("", inputPath, modelPath, labelPath, outputPath)        
+
+
 if __name__ == "__main__":
-    inference()
+    parser = argparse.ArgumentParser(description="Let's find Waldo!")
+    parser.add_argument("--input", type=str, nargs="?", default=DEFAULT_IMAGE_INPUT_PATH)
+    parser.add_argument("--model", type=str, nargs="?", default=DEFAULT_MODEL_PATH)
+    parser.add_argument("--labels", type=str, nargs="?", default=DEFAULT_LABEL_MAP_PATH)
+    parser.add_argument("--output", type=str, nargs="?", default=DEFAULT_IMAGE_OUTPUT_PATH)
+    args = parser.parse_args()
+    inference(inputPath=args.input, modelPath=args.model, labelPath=args.labels, outputPath=args.output)
