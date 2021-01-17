@@ -11,7 +11,7 @@ A neural network trained to solve the classic game of Where's Waldo. Built using
 ## Try it out for yourself!
 
 ### Website:
-Built with Django
+Built with Django. See it [here!](https://github.com/MATH4YOU/waldo_backend)
 
 ### Terminal:
 1. Model should be saved to [exported-models/my_model](exported-models/my_model)
