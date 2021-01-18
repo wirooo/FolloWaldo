@@ -8,6 +8,9 @@ A neural network trained to solve the classic game of Where's Waldo. Built using
 ### Example output:
 ![output_img](images/output/1.jpg)
 
+## Video Demo:
+[Youtube](https://www.youtube.com/watch?v=IgCsOW-bpf4&fbclid=IwAR1MJE1jO_TuQV-PIkuAoPP7KWYFGvDLUTupg90skNPJ3S6tXjvoTEFATMA)
+
 ## Try it out for yourself!
 
 ### Website:
